@@ -165,21 +165,24 @@ def get_enterprise_info(soup, soup_head):
 
 
 def scrap_urls(driver):
-    def smooth_scroll_to_div_bottom(div_xpath, Time_scrooling):
+    def smooth_scroll_to_div_bottom_element(container_el, Time_scrooling):
         driver.implicitly_wait(20)
 
         initial_height = driver.execute_script(
-            "return arguments[0].scrollHeight", driver.find_element(By.XPATH, div_xpath))
+            "return arguments[0].scrollHeight", container_el)
+        attempts_without_growth = 0
 
-        while True:
+        while attempts_without_growth < 3:
             driver.execute_script(
-                "arguments[0].scrollTop = arguments[0].scrollHeight", driver.find_element(By.XPATH, div_xpath))
+                "arguments[0].scrollTop = arguments[0].scrollHeight", container_el)
             time.sleep(Time_scrooling)
             new_height = driver.execute_script(
-                "return arguments[0].scrollHeight", driver.find_element(By.XPATH, div_xpath))
+                "return arguments[0].scrollHeight", container_el)
 
             if new_height == initial_height:
-                break
+                attempts_without_growth += 1
+            else:
+                attempts_without_growth = 0
 
             initial_height = new_height
 
@@ -189,11 +192,10 @@ def scrap_urls(driver):
     # Wait for all content to be loaded
     try:
         div = WebDriverWait(driver, 9).until(
-            EC.presence_of_element_located((By.CLASS_NAME, "XltNde"))
+            EC.presence_of_element_located((By.CSS_SELECTOR, "div[role='feed']"))
         )
 
-        smooth_scroll_to_div_bottom(
-            '/html/body/div[2]/div[3]/div[8]/div[9]/div/div/div[1]/div[2]/div/div[1]/div/div/div[1]/div[1]', 3)
+        smooth_scroll_to_div_bottom_element(div, 3)
         # Get the HTML content
         html = div.get_attribute("innerHTML")
         # html = driver.page_source
@@ -350,21 +352,24 @@ def main(search_query, Time_scrooling):
     driver.get(f'https://www.google.com/maps/search/{search_query}')
     driver.implicitly_wait(20)
 
-    def smooth_scroll_to_div_bottom(div_xpath, Time_scrooling):
+    def smooth_scroll_to_div_bottom_element(container_el, Time_scrooling):
         driver.implicitly_wait(20)
 
         initial_height = driver.execute_script(
-            "return arguments[0].scrollHeight", driver.find_element(By.XPATH, div_xpath))
+            "return arguments[0].scrollHeight", container_el)
+        attempts_without_growth = 0
 
-        while True:
+        while attempts_without_growth < 3:
             driver.execute_script(
-                "arguments[0].scrollTop = arguments[0].scrollHeight", driver.find_element(By.XPATH, div_xpath))
+                "arguments[0].scrollTop = arguments[0].scrollHeight", container_el)
             time.sleep(Time_scrooling)
             new_height = driver.execute_script(
-                "return arguments[0].scrollHeight", driver.find_element(By.XPATH, div_xpath))
+                "return arguments[0].scrollHeight", container_el)
 
             if new_height == initial_height:
-                break
+                attempts_without_growth += 1
+            else:
+                attempts_without_growth = 0
 
             initial_height = new_height
 
@@ -375,7 +380,7 @@ def main(search_query, Time_scrooling):
         # Use WebDriverWait with expected_conditions to wait for the element to be present
         el = WebDriverWait(driver, timeout).until(
             EC.presence_of_element_located(
-                (By.CLASS_NAME, "Nv2PK.Q2HXcd.THOPZb, Nv2PK.tH5CWc.THOPZb"))
+                (By.CSS_SELECTOR, ".Nv2PK.Q2HXcd.THOPZb, .Nv2PK.tH5CWc.THOPZb"))
         )
         print('Element found (Nv2PK Q2HXcd THOPZb or Nv2PK tH5CWc THOPZb)')
     except Exception as e:
@@ -398,8 +403,17 @@ def main(search_query, Time_scrooling):
     # element.click()
 
     if el is not None:
-        smooth_scroll_to_div_bottom(
-            '/html/body/div[2]/div[3]/div[8]/div[9]/div/div/div[1]/div[2]/div/div[1]/div/div/div[1]/div[1]', Time_scrooling)
+        try:
+            results_feed = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, "div[role='feed']"))
+            )
+        except Exception:
+            # Fallback: try older container class
+            results_feed = WebDriverWait(driver, 5).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, "#QA0Szd div.m6QErb.DxyBCb.kA9KIf.dS8AEf.ecceSd"))
+            )
+
+        smooth_scroll_to_div_bottom_element(results_feed, Time_scrooling)
 
         data = []
         try:
