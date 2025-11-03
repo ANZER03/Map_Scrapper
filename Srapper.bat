@@ -1,0 +1,1 @@
+python -m streamlit run ex.py

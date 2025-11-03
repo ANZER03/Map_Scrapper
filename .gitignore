@@ -1,0 +1,64 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Logs
+*.log
+logs/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE/editor
+.vscode/
+.idea/
+
+# Test/coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Streamlit
+.streamlit/
+secrets.toml
+
+# Selenium/Chrome
+chrome-user-data/
+selenium-sessions/
+
+# Local data/output
+outputs/
+*.csv
+*.xlsx
+
+# Credentials and private keys
+scrapper-421600-b8486ed62c07.json
+*.pem
+*.key
+*.p12
+
+# Cache
+.cache/
+
+# Misc
+*.bak
+*.tmp
+
+
